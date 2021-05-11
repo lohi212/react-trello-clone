@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Segment } from 'semantic-ui-react';
 import { useDrag } from 'react-dnd'
 
-function Task({ task }) {
-    const [{isDragging}, drag] = useDrag(() => ({
+function Task({ task, column }) {
+    const [{isDragging}, drag] = useDrag(useMemo(() => ({
         type: 'TASK',
-        item: task,
+        item: { task, column },
         end: (item, monitor) => {
             const dropResult = monitor.getDropResult();
-            console.log(item);
+            // console.log(item);
         },
         collect: monitor => ({
           isDragging: !!monitor.isDragging(),
           handlerId: monitor.getHandlerId(),
         }),
-    }))
+    }), [{...task}]))
 
     return (
         <div ref={drag}>

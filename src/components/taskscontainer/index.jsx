@@ -1,21 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container } from 'semantic-ui-react';
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+
 import TasksColumn from '../taskscolumn';
 import { TASKS } from './tasks.constants';
 import './index.css';
 
 function TasksContainer(props) {
+
+    const [tasks, setTasks] = useState(TASKS);
+
+    function handleDragEnd(item, key) {
+        const newTasks = JSON.parse(JSON.stringify(tasks));
+        const filteredTasks = [];
+        tasks[item.column].forEach(task => {
+            if (task.id !== item.task.id) {
+                filteredTasks.push(task);
+            }
+        });
+
+        newTasks[item.column] = JSON.parse(JSON.stringify(filteredTasks));
+        newTasks[key] = [item.task, ...newTasks[key]];
+        setTasks(newTasks);
+    }
+
     return (
-        <DndProvider backend={HTML5Backend}>
             <Container style={{ display: 'flex', backgroundColor: 'rgb(0, 121, 191)' }}>
                 {
-                    ['INPROGRESS', 'TODO', 'DONE'].map(state => <TasksColumn tasks={TASKS} />)
+                    Object.keys(tasks).map(task => (
+                        <TasksColumn 
+                            tasks={tasks[task]} 
+                            column={task}
+                            onDragEng={handleDragEnd}
+                        />
+                    ))
                 }
             </Container>
-        </DndProvider>
-       
     );
 }
 

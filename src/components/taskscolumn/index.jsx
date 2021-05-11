@@ -1,22 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Segment, Button, Icon } from 'semantic-ui-react';
 
 import { useDrop } from 'react-dnd'
 import Task from '../taskcard';
 
 
-function TasksColumn({ tasks }) {
-
-    const [{ canDrop, isOver }, drop] = useDrop(() => ({
+function TasksColumn({ tasks, column, onDragEng }) {
+    const [{ canDrop, isOver }, drop] = useDrop(useMemo(() => ({
         accept: 'TASK',
-        drop: () => {
-            console.log('dropped')
+        drop: (item) => {
+           console.log(item, column);
+           onDragEng(item, column);
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop(),
         }),
-      }))
+      }), [[...tasks]]))
 
     return (
         <div ref={drop}>
@@ -31,8 +31,9 @@ function TasksColumn({ tasks }) {
                 }}
                 raised
             >
+                <h4>{column}</h4>
                 {
-                    tasks.map(task => <Task task={task} />)
+                    tasks.map(task => <Task task={task} column={column} />)
                 }
                 <Button icon labelPosition='left'>
                     <Icon name='plus' style={{ backgroundColor: 'transparent' }} />
